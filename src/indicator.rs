@@ -1,5 +1,3 @@
-use rand::prelude::*;
-
 pub fn mise_a_jour(
     pareto_front: &mut Vec<(Vec<bool>, Vec<u32>)>,
     x: (Vec<bool>, Vec<u32>),
@@ -23,37 +21,6 @@ pub fn mise_a_jour(
         pareto_front.push(x);
     }
     updated
-}
-pub fn get_rand_sol(
-    m: usize,
-    w: &[u32],
-    p: usize,
-    v: &[Vec<u32>],
-    max_cap: u32,
-) -> Vec<(Vec<bool>, Vec<u32>)> {
-    let mut rng = rand::rng();
-    let mut ynd: Vec<(Vec<bool>, Vec<u32>)> = Vec::new();
-    let n = w.len();
-    for _ in 0..m.pow(2) {
-        let mut x_start = vec![false; n as usize];
-        let mut indices: Vec<usize> = (0..n).collect();
-        indices.shuffle(&mut rng);
-
-        let mut w_total = 0;
-        let mut v_start = vec![0; p];
-
-        for i in indices {
-            if w_total + w[i] <= max_cap {
-                x_start[i] = true;
-                w_total += w[i];
-                for j in 0..p {
-                    v_start[j] += v[i][j as usize];
-                }
-            }
-        }
-        let updated = mise_a_jour(&mut ynd, (x_start, v_start));
-    }
-    ynd
 }
 /// Compare la proportion de points de YN retrouvés dans YApprox
 pub fn proportion(yn: &[Vec<f64>], y_approx: &[(usize, Vec<f64>)]) -> f64 {
