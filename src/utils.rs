@@ -25,7 +25,7 @@ pub fn plot_points(
         });
     // Crée le graphique
     let mut chart = ChartBuilder::on(&root)
-        .caption("Nuage de points YN", ("sans-serif", 25))
+        .caption("Front de pareto", ("sans-serif", 25))
         .margin(20)
         .x_label_area_size(40)
         .y_label_area_size(40)
@@ -46,7 +46,7 @@ pub fn plot_points(
     chart.draw_series(
         approx_yn
             .iter()
-            .map(|v| Circle::new((v[0], v[1]), 3, RED.filled())),
+            .map(|v| Circle::new((v[0], v[1]), 2, RED.filled())),
     )?;
 
     // Sauvegarde l’image

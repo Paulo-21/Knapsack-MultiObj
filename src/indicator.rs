@@ -2,23 +2,19 @@ use rand::prelude::*;
 
 pub fn mise_a_jour(
     pareto_front: &mut Vec<(Vec<bool>, Vec<u32>)>,
-    mut x: (Vec<bool>, Vec<u32>),
+    x: (Vec<bool>, Vec<u32>),
 ) -> bool {
     let mut updated = pareto_front.is_empty();
     let mut indices = Vec::new();
     for (k, xp) in pareto_front.iter_mut().enumerate() {
-        //print!("{:?} {:?}", xp.1, x.1);
         if xp.1[0] >= x.1[0] && xp.1[1] >= x.1[1] {
-            //println!();
             return false;
         } else {
             updated = true;
             if xp.1[0] <= x.1[0] && xp.1[1] <= x.1[1] {
-                std::mem::swap(&mut *xp, &mut x);
                 indices.push(k);
             }
         }
-        //println!(" {}", updated);
     }
     if updated {
         for (i, idx) in indices.iter().enumerate() {

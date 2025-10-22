@@ -20,6 +20,12 @@ pub fn read_file(filename: String) -> (Vec<u32>, Vec<Vec<u32>>, u32) {
             v[i].push(data[1]);
             v[i].push(data[2]);
             i = i + 1;
+        } else if line.starts_with('n') {
+            let mut s = line.split_whitespace();
+            s.next();
+            let size: usize = s.next().unwrap().parse().unwrap();
+            w.reserve_exact(size);
+            v.reserve_exact(size);
         } else {
             if line.starts_with('W') {
                 let mut iter_line = line.split_whitespace();

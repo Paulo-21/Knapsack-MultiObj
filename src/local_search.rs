@@ -18,9 +18,8 @@ pub fn pls(
     while !pop.is_empty() {
         for p in pop.iter_mut() {
             let all_pprime = get_voisins(p, w, v, max_cap, &weight_sorted_idx);
-            //println!("{}", all_pprime.len());
             for pp in all_pprime {
-                if !(p.1[0] > pp.1[0] || p.1[1] > pp.1[1]) {
+                if !(p.1[0] >= pp.1[0] && p.1[1] >= pp.1[1]) {
                     if mise_a_jour(&mut pareto_front, pp.clone()) {
                         mise_a_jour(&mut pop_aux, pp);
                     }
@@ -28,6 +27,7 @@ pub fn pls(
             }
         }
 
+        println!("{}", pop_aux.len());
         //println!("{}", pop_aux.len());
         std::mem::swap(&mut pop, &mut pop_aux);
         pop_aux.clear();
@@ -45,7 +45,9 @@ fn get_voisins(
     let (take, profit) = x;
     let mut tot_weight = 0;
     for (ti, wi) in take.iter().zip(w) {
-        tot_weight += wi * (*ti as u32); //Ajoute l si c:1, Branchless
+        if *ti {
+            tot_weight += wi;
+        }
     }
     let mut voisins = Vec::new();
 
@@ -59,13 +61,12 @@ fn get_voisins(
                 if *s != k && !take[*s] && tot_weight + w[*s] <= max_cap {
                     profit[0] += v[*s][0];
                     profit[1] += v[*s][1];
+                    take[*s] = true;
                     voisins.push((take.clone(), profit.clone()));
-                }
-                if tot_weight + w[*s] > max_cap {
-                    take[k] = true;
-                    profit[0] += v[k][0];
-                    profit[1] += v[k][1];
-                    tot_weight += w[k];
+                    take[*s] = false;
+                    profit[0] -= v[*s][0];
+                    profit[1] -= v[*s][1];
+                } else if tot_weight + w[*s] > max_cap {
                     break;
                 }
             }
