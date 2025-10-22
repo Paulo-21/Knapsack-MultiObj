@@ -2,7 +2,11 @@ use plotters::prelude::*;
 use std::error::Error;
 
 /// Trace un nuage de points (scatter plot) pour YN
-pub fn plot_points(yn: &[Vec<u32>], output_file: &str) -> Result<(), Box<dyn Error>> {
+pub fn plot_points(
+    yn: &[Vec<u32>],
+    approx_yn: &[Vec<u32>],
+    output_file: &str,
+) -> Result<(), Box<dyn Error>> {
     // On crée la surface de dessin (ici, une image PNG)
     let root = BitMapBackend::new(output_file, (800, 600)).into_drawing_area();
     root.fill(&WHITE)?;
@@ -38,6 +42,11 @@ pub fn plot_points(yn: &[Vec<u32>], output_file: &str) -> Result<(), Box<dyn Err
     chart.draw_series(
         yn.iter()
             .map(|v| Circle::new((v[0], v[1]), 3, BLUE.filled())),
+    )?;
+    chart.draw_series(
+        approx_yn
+            .iter()
+            .map(|v| Circle::new((v[0], v[1]), 3, RED.filled())),
     )?;
 
     // Sauvegarde l’image

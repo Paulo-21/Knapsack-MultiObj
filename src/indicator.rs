@@ -5,18 +5,25 @@ pub fn mise_a_jour(
     mut x: (Vec<bool>, Vec<u32>),
 ) -> bool {
     let mut updated = pareto_front.is_empty();
-    for xp in pareto_front.iter_mut() {
-        if !(xp.1[0] < x.1[0] || xp.1[1] < x.1[1]) {
-            updated = false;
-            break;
+    let mut indices = Vec::new();
+    for (k, xp) in pareto_front.iter_mut().enumerate() {
+        //print!("{:?} {:?}", xp.1, x.1);
+        if xp.1[0] >= x.1[0] && xp.1[1] >= x.1[1] {
+            //println!();
+            return false;
         } else {
             updated = true;
             if xp.1[0] <= x.1[0] && xp.1[1] <= x.1[1] {
                 std::mem::swap(&mut *xp, &mut x);
+                indices.push(k);
             }
         }
+        //println!(" {}", updated);
     }
     if updated {
+        for (i, idx) in indices.iter().enumerate() {
+            pareto_front.remove(idx - i);
+        }
         pareto_front.push(x);
     }
     updated

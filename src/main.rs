@@ -18,11 +18,10 @@ fn main() {
 
     // Lecture des points non dominés
     let filename_eff = format!("Data/{}_items/2KP{}-TA-{}.eff", n, n, num_instance);
-    //let yn = read_points(filename_eff, p);
+    let yn = read_points(filename_eff, p);
     //println!("{:?}", yn);
-    //plot_points(&yn, "points.png").expect("RE");*/
-    let m = 100;
-    //let pareto_front = indicator::get_rand_sol(m, &w, p, &v, max_cap);
-    //println!("{:?}", x);
-    pls(m, &w, p, &v, max_cap);
+    let m = 10000000;
+    let approx_yn = pls(m, &w, p, &v, max_cap);
+    let approx_pt: Vec<Vec<u32>> = approx_yn.iter().map(|(_, y)| y.clone()).collect();
+    plot_points(&yn, &approx_pt, "points.png").expect("RE");
 }

@@ -1,18 +1,24 @@
 use crate::indicator::mise_a_jour;
 
-pub fn pls(m: usize, w: &[u32], p: usize, v: &[Vec<u32>], max_cap: u32) {
+pub fn pls(
+    m: usize,
+    w: &[u32],
+    p: usize,
+    v: &[Vec<u32>],
+    max_cap: u32,
+) -> Vec<(Vec<bool>, Vec<u32>)> {
     println!("PLS1 Start");
     let mut weight_sorted_idx: Vec<usize> = (0..w.len()).collect();
     weight_sorted_idx.sort_by_key(|&i| w[i]);
 
     let mut pareto_front = gen_init_pop(w, v, max_cap, m);
     let mut pop = pareto_front.clone();
-    println!("{:?}", pareto_front);
     let mut pop_aux: Vec<(Vec<bool>, Vec<u32>)> = Vec::new();
-
+    println!("Start with {} pt", pop.len());
     while !pop.is_empty() {
         for p in pop.iter_mut() {
             let all_pprime = get_voisins(p, w, v, max_cap, &weight_sorted_idx);
+            //println!("{}", all_pprime.len());
             for pp in all_pprime {
                 if !(p.1[0] > pp.1[0] || p.1[1] > pp.1[1]) {
                     if mise_a_jour(&mut pareto_front, pp.clone()) {
@@ -21,10 +27,13 @@ pub fn pls(m: usize, w: &[u32], p: usize, v: &[Vec<u32>], max_cap: u32) {
                 }
             }
         }
+
+        //println!("{}", pop_aux.len());
         std::mem::swap(&mut pop, &mut pop_aux);
         pop_aux.clear();
     }
-    println!("{:?}", pareto_front);
+    //println!("{:?}", pareto_front.len());
+    return pareto_front;
 }
 fn get_voisins(
     x: &mut (Vec<bool>, Vec<u32>),
@@ -45,6 +54,7 @@ fn get_voisins(
             take[k] = false;
             profit[0] -= v[k][0];
             profit[1] -= v[k][1];
+            tot_weight -= w[k];
             for s in weight_sorted_idx {
                 if *s != k && !take[*s] && tot_weight + w[*s] <= max_cap {
                     profit[0] += v[*s][0];
@@ -55,12 +65,14 @@ fn get_voisins(
                     take[k] = true;
                     profit[0] += v[k][0];
                     profit[1] += v[k][1];
+                    tot_weight += w[k];
                     break;
                 }
             }
             take[k] = true;
             profit[0] += v[k][0];
             profit[1] += v[k][1];
+            tot_weight += w[k];
         }
     }
     voisins
@@ -69,17 +81,12 @@ fn gen_init_pop(w: &[u32], v: &[Vec<u32>], max_cap: u32, m: usize) -> Vec<(Vec<b
     let mut pareto_front: Vec<(Vec<bool>, Vec<u32>)> = Vec::new();
     for i in 0..=m {
         let q = (1. / m as f32) * i as f32;
-        println!("{}", q);
         let greedy_sol = gen_sol_q(w, v, max_cap, q);
-        println!("G {:?}", greedy_sol);
-        println!("P {:?}", pareto_front);
-        let u = mise_a_jour(&mut pareto_front, greedy_sol);
-        println!("u : {}", u);
+        mise_a_jour(&mut pareto_front, greedy_sol);
     }
     pareto_front
 }
 fn gen_sol_q(w: &[u32], v: &[Vec<u32>], max_cap: u32, q: f32) -> (Vec<bool>, Vec<u32>) {
-    let q = 0.5;
     let obj: Vec<usize> = (0..w.len()).collect();
     let mut sol = vec![false; w.len()];
     let mut a = Vec::with_capacity(w.len());
