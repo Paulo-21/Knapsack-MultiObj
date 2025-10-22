@@ -5,48 +5,76 @@ pub fn pls(m: usize, w: &[u32], p: usize, v: &[Vec<u32>], max_cap: u32) {
     let mut weight_sorted_idx: Vec<usize> = (0..w.len()).collect();
     weight_sorted_idx.sort_by_key(|&i| w[i]);
 
-    let mut parento_front = gen_init_pop(w, v, max_cap, m);
-    let mut parento_aux: Vec<(Vec<bool>, Vec<u32>)> = Vec::new();
-    while !parento_front.is_empty() {
-        for p in parento_front.iter_mut() {
-            let pprime = get_voisins(p, w, max_cap, &weight_sorted_idx);
+    let mut pareto_front = gen_init_pop(w, v, max_cap, m);
+    let mut pop = pareto_front.clone();
+    println!("{:?}", pareto_front);
+    let mut pop_aux: Vec<(Vec<bool>, Vec<u32>)> = Vec::new();
+
+    while !pop.is_empty() {
+        for p in pop.iter_mut() {
+            let all_pprime = get_voisins(p, w, v, max_cap, &weight_sorted_idx);
+            for pp in all_pprime {
+                if !(p.1[0] > pp.1[0] || p.1[1] > pp.1[1]) {
+                    if mise_a_jour(&mut pareto_front, pp.clone()) {
+                        mise_a_jour(&mut pop_aux, pp);
+                    }
+                }
+            }
         }
+        std::mem::swap(&mut pop, &mut pop_aux);
+        pop_aux.clear();
     }
-    println!("{:?}", parento_front);
+    println!("{:?}", pareto_front);
 }
 fn get_voisins(
     x: &mut (Vec<bool>, Vec<u32>),
     w: &[u32],
+    v: &[Vec<u32>],
     max_cap: u32,
     weight_sorted_idx: &Vec<usize>,
-) {
-    // -> Vec<(Vec<bool>, Vec<u32>)> {
+) -> Vec<(Vec<bool>, Vec<u32>)> {
     let (take, profit) = x;
     let mut tot_weight = 0;
-    for (c, l) in take.iter().zip(w) {
-        tot_weight += l * (*c as u32); //Ajoute l si c:1, Branchless
+    for (ti, wi) in take.iter().zip(w) {
+        tot_weight += wi * (*ti as u32); //Ajoute l si c:1, Branchless
     }
     let mut voisins = Vec::new();
 
-    for (k, n) in take.iter().enumerate() {
-        if *n {
-            *n = false;
+    for k in 0..take.len() {
+        if take[k] {
+            take[k] = false;
+            profit[0] -= v[k][0];
+            profit[1] -= v[k][1];
             for s in weight_sorted_idx {
-                if *s < k && tot_weight + w[*s] <= max_cap {
-                    let mut copy = take.clone();
-                    voisins.push((copy,));
+                if *s != k && !take[*s] && tot_weight + w[*s] <= max_cap {
+                    profit[0] += v[*s][0];
+                    profit[1] += v[*s][1];
+                    voisins.push((take.clone(), profit.clone()));
+                }
+                if tot_weight + w[*s] > max_cap {
+                    take[k] = true;
+                    profit[0] += v[k][0];
+                    profit[1] += v[k][1];
+                    break;
                 }
             }
-            *n = true;
+            take[k] = true;
+            profit[0] += v[k][0];
+            profit[1] += v[k][1];
         }
     }
+    voisins
 }
 fn gen_init_pop(w: &[u32], v: &[Vec<u32>], max_cap: u32, m: usize) -> Vec<(Vec<bool>, Vec<u32>)> {
     let mut pareto_front: Vec<(Vec<bool>, Vec<u32>)> = Vec::new();
-    for i in 0..m {
+    for i in 0..=m {
         let q = (1. / m as f32) * i as f32;
+        println!("{}", q);
         let greedy_sol = gen_sol_q(w, v, max_cap, q);
-        mise_a_jour(&mut pareto_front, greedy_sol);
+        println!("G {:?}", greedy_sol);
+        println!("P {:?}", pareto_front);
+        let u = mise_a_jour(&mut pareto_front, greedy_sol);
+        println!("u : {}", u);
     }
     pareto_front
 }

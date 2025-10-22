@@ -1,28 +1,22 @@
 use rand::prelude::*;
-use std::f64;
 
 pub fn mise_a_jour(
     pareto_front: &mut Vec<(Vec<bool>, Vec<u32>)>,
-    x: (Vec<bool>, Vec<u32>),
+    mut x: (Vec<bool>, Vec<u32>),
 ) -> bool {
     let mut updated = pareto_front.is_empty();
-    let mut indice = Vec::new();
-    for (k, xp) in pareto_front.iter().enumerate() {
-        if xp.1[0] >= x.1[0] && xp.1[1] >= x.1[1] {
+    for xp in pareto_front.iter_mut() {
+        if !(xp.1[0] < x.1[0] || xp.1[1] < x.1[1]) {
             updated = false;
             break;
         } else {
             updated = true;
             if xp.1[0] <= x.1[0] && xp.1[1] <= x.1[1] {
-                updated = true;
-                indice.push(k);
+                std::mem::swap(&mut *xp, &mut x);
             }
         }
     }
     if updated {
-        for (k, i) in indice.iter().enumerate() {
-            pareto_front.remove(*i - k);
-        }
         pareto_front.push(x);
     }
     updated
