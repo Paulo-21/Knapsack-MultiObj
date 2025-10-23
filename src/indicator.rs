@@ -1,27 +1,3 @@
-pub fn mise_a_jour(
-    pareto_front: &mut Vec<(Vec<bool>, Vec<u32>)>,
-    x: (Vec<bool>, Vec<u32>),
-) -> bool {
-    let mut updated = pareto_front.is_empty();
-    let mut indices = Vec::new();
-    for (k, xp) in pareto_front.iter_mut().enumerate() {
-        if xp.1[0] >= x.1[0] && xp.1[1] >= x.1[1] {
-            return false;
-        } else {
-            updated = true;
-            if xp.1[0] <= x.1[0] && xp.1[1] <= x.1[1] {
-                indices.push(k);
-            }
-        }
-    }
-    if updated {
-        for (i, idx) in indices.iter().enumerate() {
-            pareto_front.remove(idx - i);
-        }
-        pareto_front.push(x);
-    }
-    updated
-}
 /// Compare la proportion de points de YN retrouvés dans YApprox
 pub fn proportion(yn: &[Vec<f64>], y_approx: &[(usize, Vec<f64>)]) -> f64 {
     let mut count = 0;

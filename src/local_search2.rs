@@ -1,4 +1,6 @@
-pub fn pls1(
+use crate::local_search::mise_a_jour;
+
+pub fn pls2(
     m: usize,
     w: &[u32],
     p: usize,
@@ -10,6 +12,8 @@ pub fn pls1(
     weight_sorted_idx.sort_by_key(|&i| w[i]);
 
     let mut pareto_front = gen_init_pop(w, v, max_cap, m);
+    pareto_front.sort_by(|a, b| a.1[0].cmp(&b.1[0]));
+
     let mut pop = pareto_front.clone();
     let mut pop_aux: Vec<(Vec<bool>, Vec<u32>)> = Vec::new();
     println!("Start with {} pt", pop.len());
@@ -18,7 +22,7 @@ pub fn pls1(
             let all_pprime = get_voisins(p, w, v, max_cap, &weight_sorted_idx);
             for pp in all_pprime {
                 if !(p.1[0] >= pp.1[0] && p.1[1] >= pp.1[1]) {
-                    if mise_a_jour(&mut pareto_front, pp.clone()) {
+                    if mise_a_jour2(&mut pareto_front, pp.clone()) {
                         mise_a_jour(&mut pop_aux, pp);
                     }
                 }
@@ -76,12 +80,27 @@ fn get_voisins(
     }
     voisins
 }
-pub fn mise_a_jour(
+pub fn mise_a_jour2(
     pareto_front: &mut Vec<(Vec<bool>, Vec<u32>)>,
     x: (Vec<bool>, Vec<u32>),
 ) -> bool {
     let mut updated = pareto_front.is_empty();
     let mut indices = Vec::new();
+    let mut index = match pareto_front.binary_search_by(|pt| pt.1[0].cmp(&x.1[0])) {
+        Ok(_) => return false,
+        Err(index) => index,
+    };
+    let done = false;
+    while !done {
+        if pareto_front[index].1[1] >= x.1[1] {
+            return false;
+        } else {
+            updated = true;
+            if pareto_front[index].1[0] <= x.1[0] && pareto_front[index].1[1] <= x.1[1] {
+                //indices.push(k);
+            }
+        }
+    }
     for (k, xp) in pareto_front.iter_mut().enumerate() {
         if xp.1[0] >= x.1[0] && xp.1[1] >= x.1[1] {
             return false;

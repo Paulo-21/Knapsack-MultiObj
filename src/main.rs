@@ -5,10 +5,12 @@ static GLOBAL: MiMalloc = MiMalloc;
 
 mod indicator;
 mod local_search;
+mod local_search2;
 mod parser;
 mod utils;
 
-use local_search::pls;
+use local_search::pls1;
+use local_search2::pls2;
 use parser::{read_file, read_points};
 use std::{env, time::Instant};
 use utils::plot_points;
@@ -18,6 +20,7 @@ fn main() {
     let num_instance = 9;
     let n = 700;
     let p = 2;
+    let pls_version = 1;
     let mut save = false;
 
     if env::args().len() > 1 {
@@ -30,7 +33,12 @@ fn main() {
 
     let m = 100;
     let start = Instant::now();
-    let approx_yn = pls(m, &w, p, &v, max_cap);
+    let approx_yn = match pls_version {
+        1 => pls1(m, &w, p, &v, max_cap),
+        2 => pls2(m, &w, p, &v, max_cap),
+        //3 => pls3(m, &w, p, &v, max_cap),
+        _ => panic!("PLS version non supporté"),
+    };
     println!("Computed in {}ms", start.elapsed().as_millis());
     // Lecture des points non dominés
     if save {
