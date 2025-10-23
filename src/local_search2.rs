@@ -47,9 +47,7 @@ fn get_voisins(
     let (take, profit) = x;
     let mut tot_weight = 0;
     for (ti, wi) in take.iter().zip(w) {
-        if *ti {
-            tot_weight += wi;
-        }
+        tot_weight += wi * (*ti as u32);
     }
     let mut voisins = Vec::new();
 
@@ -84,40 +82,34 @@ pub fn mise_a_jour2(
     pareto_front: &mut Vec<(Vec<bool>, Vec<u32>)>,
     x: (Vec<bool>, Vec<u32>),
 ) -> bool {
-    let mut updated = pareto_front.is_empty();
-    let mut indices = Vec::new();
-    let mut index = match pareto_front.binary_search_by(|pt| pt.1[0].cmp(&x.1[0])) {
-        Ok(_) => return false,
+    let index_insert = match pareto_front.binary_search_by(|pt| pt.1[0].cmp(&x.1[0])) {
+        Ok(j) => j,
         Err(index) => index,
     };
-    let done = false;
-    while !done {
-        if pareto_front[index].1[1] >= x.1[1] {
+    let mut done = false;
+    let mut k = index_insert;
+    if index_insert >= pareto_front.len() {
+        k -= 1;
+        while k > 0 && pareto_front[k].1[1] <= x.1[1] {
+            pareto_front.remove(k);
+            //if pareto_front[k].1[1] <= x.1[1] {
+            k -= 1;
+        }
+        pareto_front.insert(k + 1, x);
+    } else {
+        if pareto_front[k].1[1] < x.1[1] {
             return false;
-        } else {
-            updated = true;
-            if pareto_front[index].1[0] <= x.1[0] && pareto_front[index].1[1] <= x.1[1] {
-                //indices.push(k);
-            }
         }
-    }
-    for (k, xp) in pareto_front.iter_mut().enumerate() {
-        if xp.1[0] >= x.1[0] && xp.1[1] >= x.1[1] {
-            return false;
-        } else {
-            updated = true;
-            if xp.1[0] <= x.1[0] && xp.1[1] <= x.1[1] {
-                indices.push(k);
-            }
+        k -= 1;
+        while k > 0 && pareto_front[k].1[1] <= x.1[1] {
+            pareto_front.remove(k);
+            //if pareto_front[k].1[1] <= x.1[1] {
+            k -= 1;
         }
+        pareto_front.insert(k + 1, x);
     }
-    if updated {
-        for (i, idx) in indices.iter().enumerate() {
-            pareto_front.remove(idx - i);
-        }
-        pareto_front.push(x);
-    }
-    updated
+
+    true
 }
 fn gen_init_pop(w: &[u32], v: &[Vec<u32>], max_cap: u32, m: usize) -> Vec<(Vec<bool>, Vec<u32>)> {
     let mut pareto_front: Vec<(Vec<bool>, Vec<u32>)> = Vec::new();

@@ -15,11 +15,10 @@ pub fn read_file(filename: String) -> (Vec<u32>, Vec<Vec<u32>>, u32) {
                 .map(|s| s.parse::<u32>())
                 .collect::<Result<Vec<_>, _>>()
                 .unwrap();
-            //let data = line.split_whitespace();
             w.push(data[0]);
             v[i].push(data[1]);
             v[i].push(data[2]);
-            i = i + 1;
+            i += 1;
         } else if line.starts_with('n') {
             let mut s = line.split_whitespace();
             s.next();

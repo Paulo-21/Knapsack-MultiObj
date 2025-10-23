@@ -18,9 +18,9 @@ use utils::plot_points;
 fn main() {
     println!("TME enssemble non-dominé");
     let num_instance = 9;
-    let n = 700;
+    let n = 100;
     let p = 2;
-    let pls_version = 1;
+    let pls_version = 2;
     let mut save = false;
 
     if env::args().len() > 1 {
