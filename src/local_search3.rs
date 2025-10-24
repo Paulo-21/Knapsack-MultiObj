@@ -1,11 +1,11 @@
-pub fn pls2(
+pub fn pls3(
     m: usize,
     w: &[u32],
     _p: usize,
     v: &[Vec<u32>],
     max_cap: u32,
 ) -> Vec<(Vec<bool>, Vec<u32>)> {
-    println!("PLS2 Start");
+    println!("PLS3 Start");
     let mut weight_sorted_idx: Vec<usize> = (0..w.len()).collect();
     weight_sorted_idx.sort_by_key(|&i| w[i]);
 
@@ -19,10 +19,12 @@ pub fn pls2(
         for p in pop.iter_mut() {
             let all_pprime = get_voisins(p, w, v, max_cap, &weight_sorted_idx);
             for pp in all_pprime {
-                if !(p.1[0] >= pp.1[0] && p.1[1] >= pp.1[1])
-                    && mise_a_jour2(&mut pareto_front, pp.clone())
-                {
-                    mise_a_jour2(&mut pop_aux, pp);
+                if !(p.1[0] >= pp.1[0] && p.1[1] >= pp.1[1]) {
+                    let updated = mise_a_jour2(&mut pareto_front, pp.clone());
+
+                    if updated {
+                        mise_a_jour2(&mut pop_aux, pp);
+                    }
                 }
             }
         }

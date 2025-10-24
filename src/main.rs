@@ -6,11 +6,13 @@ static GLOBAL: MiMalloc = MiMalloc;
 mod indicator;
 mod local_search;
 mod local_search2;
+mod local_search3;
 mod parser;
 mod utils;
 
 use local_search::pls1;
 use local_search2::pls2;
+use local_search3::pls3;
 use parser::{read_file, read_points};
 use std::{env, time::Instant};
 use utils::plot_points;
@@ -18,7 +20,7 @@ use utils::plot_points;
 fn main() {
     println!("TME enssemble non-dominé");
     let num_instance = 9;
-    let n = 100;
+    let n = 700;
     let p = 2;
     let pls_version = 2;
     let mut save = false;
@@ -36,7 +38,7 @@ fn main() {
     let approx_yn = match pls_version {
         1 => pls1(m, &w, p, &v, max_cap),
         2 => pls2(m, &w, p, &v, max_cap),
-        //3 => pls3(m, &w, p, &v, max_cap),
+        3 => pls3(m, &w, p, &v, max_cap),
         _ => panic!("PLS version non supporté"),
     };
     println!("Computed in {}ms", start.elapsed().as_millis());
