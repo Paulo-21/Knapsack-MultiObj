@@ -36,7 +36,7 @@ fn get_voisins(
     w: &[u32],
     v: &[Vec<u32>],
     max_cap: u32,
-    weight_sorted_idx: &Vec<usize>,
+    weight_sorted_idx: &[usize],
     voisins: &mut Vec<(Vec<bool>, Vec<u32>)>,
 ) {
     let (take, profit) = x;
@@ -52,7 +52,7 @@ fn get_voisins(
             profit[1] -= v[k][1];
             tot_weight -= w[k];
             for s in weight_sorted_idx {
-                if *s != k && !take[*s] && tot_weight + w[*s] <= max_cap {
+                if !take[*s] && tot_weight + w[*s] <= max_cap && *s != k {
                     profit[0] += v[*s][0];
                     profit[1] += v[*s][1];
                     take[*s] = true;
