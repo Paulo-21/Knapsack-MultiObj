@@ -22,7 +22,7 @@ fn main() {
     let num_instance = 9;
     let n = 700;
     let p = 2;
-    let pls_version = 2;
+    let pls_version = 1;
     let mut save = false;
 
     if env::args().len() > 1 {

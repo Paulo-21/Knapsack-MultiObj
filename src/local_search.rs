@@ -13,10 +13,11 @@ pub fn pls1(
     let mut pop = pareto_front.clone();
     let mut pop_aux: Vec<(Vec<bool>, Vec<u32>)> = Vec::new();
     println!("Start with {} pt", pop.len());
+    let mut voisins = Vec::new();
     while !pop.is_empty() {
         for p in pop.iter_mut() {
-            let all_pprime = get_voisins(p, w, v, max_cap, &weight_sorted_idx);
-            for pp in all_pprime {
+            get_voisins(p, w, v, max_cap, &weight_sorted_idx, &mut voisins);
+            while let Some(pp) = voisins.pop() {
                 if !(p.1[0] >= pp.1[0] && p.1[1] >= pp.1[1]) {
                     if mise_a_jour(&mut pareto_front, pp.clone()) {
                         mise_a_jour(&mut pop_aux, pp);
@@ -39,7 +40,8 @@ fn get_voisins(
     v: &[Vec<u32>],
     max_cap: u32,
     weight_sorted_idx: &Vec<usize>,
-) -> Vec<(Vec<bool>, Vec<u32>)> {
+    voisins: &mut Vec<(Vec<bool>, Vec<u32>)>,
+) {
     let (take, profit) = x;
     let mut tot_weight = 0;
     for (ti, wi) in take.iter().zip(w) {
@@ -47,7 +49,6 @@ fn get_voisins(
             tot_weight += wi;
         }
     }
-    let mut voisins = Vec::new();
 
     for k in 0..take.len() {
         if take[k] {
@@ -74,7 +75,6 @@ fn get_voisins(
             tot_weight += w[k];
         }
     }
-    voisins
 }
 pub fn mise_a_jour(
     pareto_front: &mut Vec<(Vec<bool>, Vec<u32>)>,
