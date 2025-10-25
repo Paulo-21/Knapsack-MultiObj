@@ -149,7 +149,7 @@ fn gen_sol_q(w: &[u32], v: &[Vec<u32>], max_cap: u32, q: f32) -> (Vec<bool>, Vec
 }
 fn _print_neightboor(
     k: usize,
-    front: &Vec<(Vec<bool>, Vec<u32>)>,
+    front: &[(Vec<bool>, Vec<u32>)],
     n: usize,
     x: &(Vec<bool>, Vec<u32>),
     res: bool,

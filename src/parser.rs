@@ -25,12 +25,10 @@ pub fn read_file(filename: String) -> (Vec<u32>, Vec<Vec<u32>>, u32) {
             let size: usize = s.next().unwrap().parse().unwrap();
             w.reserve_exact(size);
             v.reserve_exact(size);
-        } else {
-            if line.starts_with('W') {
-                let mut iter_line = line.split_whitespace();
-                iter_line.next();
-                max_cap = iter_line.next().unwrap().parse().unwrap();
-            }
+        } else if line.starts_with('W') {
+            let mut iter_line = line.split_whitespace();
+            iter_line.next();
+            max_cap = iter_line.next().unwrap().parse().unwrap();
         }
         if v.last().unwrap().is_empty() {
             v.pop();

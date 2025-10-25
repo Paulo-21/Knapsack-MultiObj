@@ -1,7 +1,7 @@
 pub fn pls1(
     m: usize,
     w: &[u32],
-    p: usize,
+    _p: usize,
     v: &[Vec<u32>],
     max_cap: u32,
 ) -> Vec<(Vec<bool>, Vec<u32>)> {
@@ -18,10 +18,10 @@ pub fn pls1(
         for p in pop.iter_mut() {
             get_voisins(p, w, v, max_cap, &weight_sorted_idx, &mut voisins);
             while let Some(pp) = voisins.pop() {
-                if !(p.1[0] >= pp.1[0] && p.1[1] >= pp.1[1]) {
-                    if mise_a_jour(&mut pareto_front, pp.clone()) {
-                        mise_a_jour(&mut pop_aux, pp);
-                    }
+                if !(p.1[0] >= pp.1[0] && p.1[1] >= pp.1[1])
+                    && mise_a_jour(&mut pareto_front, pp.clone())
+                {
+                    mise_a_jour(&mut pop_aux, pp);
                 }
             }
         }
