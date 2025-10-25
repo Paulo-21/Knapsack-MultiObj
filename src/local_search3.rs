@@ -1,3 +1,4 @@
+use rand::{prelude::*, random};
 pub fn pls3(
     m: usize,
     w: &[u32],
@@ -41,35 +42,29 @@ fn get_voisins(
 ) {
     let (take, profit) = x;
     let mut tot_weight = 0;
-    for (ti, wi) in take.iter().zip(w) {
-        tot_weight += wi * (*ti as u32);
-    }
+    let q = random::<f32>();
 
-    for k in 0..take.len() {
-        if take[k] {
-            take[k] = false;
-            profit[0] -= v[k][0];
-            profit[1] -= v[k][1];
-            tot_weight -= w[k];
-            for s in weight_sorted_idx {
-                if *s != k && !take[*s] && tot_weight + w[*s] <= max_cap {
-                    profit[0] += v[*s][0];
-                    profit[1] += v[*s][1];
-                    take[*s] = true;
-                    voisins.push((take.clone(), profit.clone()));
-                    take[*s] = false;
-                    profit[0] -= v[*s][0];
-                    profit[1] -= v[*s][1];
-                } else if tot_weight + w[*s] > max_cap {
-                    break;
-                }
-            }
-            take[k] = true;
-            profit[0] += v[k][0];
-            profit[1] += v[k][1];
-            tot_weight += w[k];
+    let mut l1 = Vec::with_capacity(10);
+    let mut l2 = Vec::with_capacity(10);
+    for (k, (ti, wi)) in take.iter().zip(w).enumerate() {
+        tot_weight += wi * (*ti as u32);
+        if !ti {
+            l1.push((wi, v[k].clone()));
+        } else {
+            l2.push((wi, v[k].clone()));
         }
     }
+    l1.sort_unstable_by(|(wa, va), (wb, vb)| {
+        ((q * (va[0]) as f32 + (1. - q) * va[1] as f32) / (**wa as f32))
+            .partial_cmp(&((q * (vb[0]) as f32 + (1. - q) * vb[1] as f32) / (**wb as f32)))
+            .unwrap()
+    });
+    l2.sort_unstable_by(|(wa, va), (wb, vb)| {
+        ((q * (va[0]) as f32 + (1. - q) * va[1] as f32) / (**wa as f32))
+            .partial_cmp(&((q * (vb[0]) as f32 + (1. - q) * vb[1] as f32) / (**wb as f32)))
+            .unwrap()
+    });
+
 }
 pub fn mise_a_jour2(
     pareto_front: &mut Vec<(Vec<bool>, Vec<u32>)>,
