@@ -7,3 +7,16 @@ edition = "2024"
 plotters = "0.3"
 mimalloc = { version = "*", features = ["v3"] }
 rand = "0.9"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip=true
+panic = 'abort'
+
+[profile.perf-debug]
+inherits = "release"
+debug = true
+lto = true
+strip=false
+panic = 'abort'
