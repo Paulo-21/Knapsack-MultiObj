@@ -32,6 +32,7 @@ pub fn pls2_perf(
     }
     return pareto_front;
 }
+#[inline(always)]
 fn get_voisins(
     x: &mut (Vec<bool>, Vec<u32>),
     w: &[u32],
