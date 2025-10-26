@@ -60,7 +60,6 @@ fn get_voisins(
                     profit[1] += v[*s][1];
                     take[*s] = true;
                     if !(p[0] >= profit[0] && p[1] >= profit[1]) {
-                        //mise_a_jour2(&mut pop_aux, pp);
                         let mut updated = true;
 
                         let mut k =
@@ -88,18 +87,18 @@ fn get_voisins(
                             pareto_front.insert(k, (take.clone(), profit.clone()));
                         }
 
-                        let mut done = k > 0;
-                        k -= done as usize;
-                        while done {
-                            if pareto_front[k].1[1] <= profit[1] {
-                                pareto_front.remove(k);
-                            } else {
-                                break;
-                            }
-                            done = k > 0;
-                            k -= done as usize;
-                        }
                         if updated {
+                            let mut done = k > 0;
+                            k -= done as usize;
+                            while done {
+                                if pareto_front[k].1[1] <= profit[1] {
+                                    pareto_front.remove(k);
+                                } else {
+                                    break;
+                                }
+                                done = k > 0;
+                                k -= done as usize;
+                            }
                             mise_a_jour2(pop_aux, (take.clone(), profit.clone()));
                         }
                     }
