@@ -1,4 +1,8 @@
-use rand::{prelude::*, random};
+use rand::random;
+
+use crate::progdyn_pareto;
+const L: usize = 10;
+
 pub fn pls3(
     m: usize,
     w: &[u32],
@@ -6,9 +10,7 @@ pub fn pls3(
     v: &[Vec<u32>],
     max_cap: u32,
 ) -> Vec<(Vec<bool>, Vec<u32>)> {
-    println!("PLS2 Start");
-    let mut weight_sorted_idx: Vec<usize> = (0..w.len()).collect();
-    weight_sorted_idx.sort_by_key(|&i| w[i]);
+    println!("PLS3 Start");
 
     let mut pareto_front = gen_init_pop(w, v, max_cap, m);
     let mut all_pprime = Vec::new();
@@ -17,7 +19,7 @@ pub fn pls3(
     println!("Start with {} pt", pop.len());
     while !pop.is_empty() {
         for p in pop.iter_mut() {
-            get_voisins(p, w, v, max_cap, &weight_sorted_idx, &mut all_pprime);
+            get_voisins(p, w, v, max_cap, &mut all_pprime);
             while let Some(pp) = all_pprime.pop() {
                 if !(p.1[0] >= pp.1[0] && p.1[1] >= pp.1[1])
                     && mise_a_jour2(&mut pareto_front, pp.clone())
@@ -37,7 +39,6 @@ fn get_voisins(
     w: &[u32],
     v: &[Vec<u32>],
     max_cap: u32,
-    weight_sorted_idx: &Vec<usize>,
     voisins: &mut Vec<(Vec<bool>, Vec<u32>)>,
 ) {
     let (take, profit) = x;
@@ -64,7 +65,18 @@ fn get_voisins(
             .partial_cmp(&((q * (vb[0]) as f32 + (1. - q) * vb[1] as f32) / (**wb as f32)))
             .unwrap()
     });
-
+    let mut mini_w: Vec<u32> = Vec::with_capacity(2 * L);
+    let mut mini_profit = Vec::with_capacity(2 * L);
+    for l in l1.iter().take(L) {
+        mini_w.push(*l.0);
+        mini_profit.push(l.1.clone());
+    }
+    for l in l2.iter().take(L) {
+        mini_w.push(*l.0);
+        mini_profit.push(l.1.clone());
+    }
+    let take = progdyn_pareto::multi_obj_progdyn(&mini_w, &mini_profit, max_cap);
+    
 }
 pub fn mise_a_jour2(
     pareto_front: &mut Vec<(Vec<bool>, Vec<u32>)>,

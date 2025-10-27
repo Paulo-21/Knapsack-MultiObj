@@ -9,6 +9,7 @@ mod local_search2;
 mod local_search2_perf;
 mod local_search3;
 mod parser;
+mod progdyn_pareto;
 mod utils;
 
 use bench_all::bench_all;
@@ -25,7 +26,7 @@ fn main() {
     let num_instance = 9;
     let n = 700;
     let p = 2;
-    let pls_version = 4;
+    let pls_version = 3;
     let mut save = false;
 
     if env::args().len() > 1 {
