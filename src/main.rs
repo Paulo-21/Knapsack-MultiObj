@@ -23,12 +23,12 @@ use utils::plot_points;
 
 fn main() {
     println!("TME enssemble non-dominé");
-    let num_instance = 9;
+    let num_instance = 0;
     let n = 700;
     let p = 2;
-    let pls_version = 3;
+    let pls_version = 4;
     let mut save = false;
-
+    progdyn_pareto::test();
     if env::args().len() > 1 {
         if env::args().nth(1).unwrap().starts_with('W') {
             bench_all();

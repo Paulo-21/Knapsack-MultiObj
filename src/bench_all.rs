@@ -11,12 +11,12 @@ pub fn bench_all() {
     let m = 100;
     let p = 2;
     let num_instance = 0;
-    let mut dd = Vec::new();
+    let mut res_time = Vec::new();
     for n in (100..=700).step_by(100) {
         let filename_dat = format!("Data/{}_items/2KP{}-TA-{}.dat", n, n, num_instance);
         let (w, v, max_cap) = read_file(filename_dat);
-        let mut xx = Vec::new();
-        xx.push(n);
+        let mut time_each = Vec::new();
+        time_each.push(n);
         for pls_version in 1..=3 {
             let start = Instant::now();
             let _ = match pls_version {
@@ -26,14 +26,14 @@ pub fn bench_all() {
                 3 => pls2_perf(m, &w, p, &v, max_cap),
                 _ => panic!("PLS version non supporté"),
             };
-            xx.push(start.elapsed().as_millis());
+            time_each.push(start.elapsed().as_millis());
             println!("Computed in {}ms", start.elapsed().as_millis());
         }
-        dd.push(xx);
+        res_time.push(time_each);
     }
     let mut f = File::create("output.txt").unwrap();
 
-    for thing in &dd {
+    for thing in &res_time {
         write!(f, "{} {} {} {}\n", thing[0], thing[1], thing[2], thing[3]).unwrap();
     }
 }

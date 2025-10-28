@@ -50,33 +50,49 @@ fn get_voisins(
     for (k, (ti, wi)) in take.iter().zip(w).enumerate() {
         tot_weight += wi * (*ti as u32);
         if !ti {
-            l1.push((wi, v[k].clone()));
+            l1.push((wi, v[k].clone(), k));
         } else {
-            l2.push((wi, v[k].clone()));
+            l2.push((wi, v[k].clone(), k));
         }
     }
-    l1.sort_unstable_by(|(wa, va), (wb, vb)| {
+
+    l1.sort_unstable_by(|(wa, va, _), (wb, vb, _)| {
         ((q * (va[0]) as f32 + (1. - q) * va[1] as f32) / (**wa as f32))
             .partial_cmp(&((q * (vb[0]) as f32 + (1. - q) * vb[1] as f32) / (**wb as f32)))
             .unwrap()
     });
-    l2.sort_unstable_by(|(wa, va), (wb, vb)| {
+    l2.sort_unstable_by(|(wa, va, _), (wb, vb, _)| {
         ((q * (va[0]) as f32 + (1. - q) * va[1] as f32) / (**wa as f32))
             .partial_cmp(&((q * (vb[0]) as f32 + (1. - q) * vb[1] as f32) / (**wb as f32)))
             .unwrap()
     });
     let mut mini_w: Vec<u32> = Vec::with_capacity(2 * L);
     let mut mini_profit = Vec::with_capacity(2 * L);
+    let mut mini_idx = Vec::with_capacity(2 * L);
     for l in l1.iter().take(L) {
         mini_w.push(*l.0);
         mini_profit.push(l.1.clone());
+        mini_idx.push(l.2);
     }
     for l in l2.iter().take(L) {
         mini_w.push(*l.0);
         mini_profit.push(l.1.clone());
+        mini_idx.push(l.2);
     }
-    let take = progdyn_pareto::multi_obj_progdyn(&mini_w, &mini_profit, max_cap);
-    
+    let mini_opt = progdyn_pareto::multi_obj_progdyn(&mini_w, &mini_profit, max_cap);
+
+    for (mt, mv, mi) in mini_opt {
+        for (ni, n) in mt.iter().enumerate() {
+            let last_take = x.0[mini_idx[ni]];
+            x.0[mini_idx[ni]] = *n;
+            x.1[0] += v[mini_idx[ni]][0] * (*n as u32);
+            x.1[1] += v[mini_idx[ni]][1] * (*n as u32);
+            voisins.push(x.clone());
+            x.0[mini_idx[ni]] = last_take;
+            x.1[0] -= v[mini_idx[ni]][0] * (*n as u32);
+            x.1[1] -= v[mini_idx[ni]][1] * (*n as u32);
+        }
+    }
 }
 pub fn mise_a_jour2(
     pareto_front: &mut Vec<(Vec<bool>, Vec<u32>)>,
