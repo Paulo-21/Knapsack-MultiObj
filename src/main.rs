@@ -29,10 +29,8 @@ fn main() {
     let pls_version = 4;
     let mut save = false;
     progdyn_pareto::test();
-    if env::args().len() > 1 {
-        if env::args().nth(1).unwrap().starts_with('W') {
-            bench_all();
-        }
+    if env::args().len() > 1 && env::args().nth(1).unwrap().starts_with('W') {
+        bench_all();
     } else {
         if env::args().len() > 1 {
             save = true;
